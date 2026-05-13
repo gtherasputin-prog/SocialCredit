@@ -171,6 +171,11 @@ export default function Chat(){
   const navigate=useNavigate()
   useEffect(()=>{
     const ac=new AbortController()
+    api.get('/ws/online',{signal:ac.signal}).then(({data})=>setOnlineUsers(data||[])).catch(()=>{})
+    return()=>ac.abort()
+  },[])
+  useEffect(()=>{
+    const ac=new AbortController()
     api.get('/chat',{signal:ac.signal}).then(({data})=>setMessages(data)).catch(()=>{})
     return()=>ac.abort()
   },[])
