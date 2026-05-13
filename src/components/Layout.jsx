@@ -6,6 +6,14 @@ import{toggle}from'../slices/themeSlice'
 import{initWS,onWS}from'../ws'
 import api from'../api'
 const NOTIF_POLL=60000
+// Play the notification chime (silently ignore if autoplay is blocked)
+function playNotifSound(){
+  try{
+    const a=new Audio('/sounds/new.mp3')
+    a.volume=0.4
+    a.play().catch(()=>{})
+  }catch{}
+}
 export default function Layout(){
   const dispatch=useDispatch()
   const navigate=useNavigate()
@@ -17,10 +25,14 @@ export default function Layout(){
   const scoreClass=sc>=150?'s-great':sc>=80?'s-ok':sc>=30?'s-warn':'s-bad'
   const[notifCount,setNotifCount]=useState(0)
   const[dmCount,setDmCount]=useState(0)
+  const prevNotifCount=useRef(0)
   useEffect(()=>{if(token)initWS(token)},[token])
   useEffect(()=>{
     const off=onWS('dm',()=>{
-      if(location.pathname!=='/chat'&&location.pathname!=='/messages')setDmCount(n=>n+1)
+      if(location.pathname!=='/chat'&&location.pathname!=='/messages'){
+        setDmCount(n=>n+1)
+        playNotifSound()
+      }
     })
     return off
   },[location.pathname])
@@ -28,14 +40,21 @@ export default function Layout(){
     if(location.pathname==='/chat'||location.pathname==='/messages'){setDmCount(0)}
   },[location.pathname])
   useEffect(()=>{
-    const off=onWS('notif_count',({count})=>setNotifCount(count))
+    const off=onWS('notif_count',({count})=>{
+      if(count>prevNotifCount.current)playNotifSound()
+      prevNotifCount.current=count
+      setNotifCount(count)
+    })
     return off
   },[])
   useEffect(()=>{
     const ac=new AbortController()
     const tick=async()=>{
-      try{const{data}=await api.get('/notifications/count',{signal:ac.signal});setNotifCount(data.count)}
-      catch(e){if(e.code!=='ERR_CANCELED'){}}
+      try{
+        const{data}=await api.get('/notifications/count',{signal:ac.signal})
+        prevNotifCount.current=data.count
+        setNotifCount(data.count)
+      }catch(e){if(e.code!=='ERR_CANCELED'){}}
     }
     tick()
     const id=setInterval(tick,NOTIF_POLL)
@@ -57,7 +76,7 @@ export default function Layout(){
           {links.map(({to,label,icon,end,badge,badgeDm})=>(
             <NavLink key={to} to={to} end={end} className={({isActive})=>`nav-link${isActive?' active':''}`}>
               <span>{icon}</span> {label}
-              {badge!=null&&<span className={`nav-badge${badgeDm?' dm':''}`}>{badge}</span>}
+              {badge!=null&&<span className={`nav-badge${badgeDm?' dm':''}`}>+{badge}</span>}
             </NavLink>
           ))}
         </div>
