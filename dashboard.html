@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StegOps</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: -apple-system, Segoe UI, Roboto, sans-serif; background:#0b0f14; color:#e5e7eb; margin:0; padding:40px 20px; }
+.wrap { max-width: 640px; margin: 0 auto; }
+h1 { font-size: 1.8rem; margin-bottom: 4px; }
+.sub { color:#9ca3af; margin-bottom: 28px; }
+.card { background:#111827; border:1px solid #1f2937; border-radius:12px; padding:20px 24px; margin-bottom:16px; }
+.row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #1f2937; }
+.row:last-child { border-bottom:none; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:{{STATUS_COLOR}}; margin-right:8px; }
+.num { font-size:2rem; font-weight:700; }
+code { background:#1f2937; padding:2px 6px; border-radius:4px; font-size:0.85em; }
+a { color:#60a5fa; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>StegOps</h1>
+<div class="sub">Steganography API — status dashboard</div>
+<div class="card">
+<div class="row"><span><span class="dot"></span>{{STATUS_TEXT}}</span></div>
+<div class="row"><span>Image methods</span><span>{{IMAGE_COUNT}}</span></div>
+<div class="row"><span>Audio methods</span><span>{{AUDIO_COUNT}}</span></div>
+<div class="row"><span>Backends loaded</span><span>{{BACKENDS}}</span></div>
+</div>
+<div class="card">
+<div class="sub" style="margin-bottom:8px;">Page visits (best-effort, resets on cold start)</div>
+<div class="num">{{HITS}}</div>
+</div>
+<div class="card">
+<div class="sub" style="margin-bottom:8px;">Quick links</div>
+<div class="row"><span><code>GET /health</code></span><span>service status JSON</span></div>
+<div class="row"><span><code>POST /api/methods/&lt;type&gt;</code></span><span>list steg methods</span></div>
+<div class="row"><span><code>POST /api/embed</code></span><span>embed payload</span></div>
+<div class="row"><span><code>POST /api/extract</code></span><span>extract payload</span></div>
+</div>
+</div>
+</body>
+</html>
